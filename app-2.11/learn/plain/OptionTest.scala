@@ -1,4 +1,4 @@
-package plain
+package learn.plain
 
 /**
   * Created by slowikps on 15/10/16.

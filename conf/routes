@@ -1,0 +1,11 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+
+# An example controller showing how to write asynchronous code
+GET /message     learn.play.controllers.AsyncController.message
+
+GET /hello/:to   learn.play.controllers.Greetings.hello(to: String)
+
+GET /sqrt/:num   learn.play.controllers.Greetings.sqrt(num: Double)
