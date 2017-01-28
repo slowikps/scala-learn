@@ -51,5 +51,6 @@ object ExpandTest {
       ClosedShape
     })
     rG.run()
+    ()
   }
 }

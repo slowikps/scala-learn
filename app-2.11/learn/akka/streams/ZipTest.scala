@@ -43,5 +43,6 @@ object ZipTest {
       ClosedShape
     })
     rG.run()
+    ()
   }
 }

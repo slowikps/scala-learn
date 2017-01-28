@@ -74,6 +74,7 @@ object ReactiveTweets {
           a = a + 1
           run()
         }
+        ()
       }
     }
 
@@ -97,7 +98,7 @@ object ReactiveTweets {
   val writeAuthors: Sink[Author, Future[Done]] = Sink.foreach[Author](println)
   val writeHashtags: Sink[Hashtag, Future[Done]] = Sink.foreach[Hashtag](println)
 
-  def runGraph: Unit = {
+  def runGraph(): Unit = {
     val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b =>
       import GraphDSL.Implicits._
 
@@ -108,5 +109,6 @@ object ReactiveTweets {
       ClosedShape
     })
     g.run()
+    ()
   }
 }

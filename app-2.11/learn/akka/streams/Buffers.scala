@@ -35,5 +35,6 @@ object Buffers {
       ClosedShape
     })
     rG.run()
+    ()
   }
 }
