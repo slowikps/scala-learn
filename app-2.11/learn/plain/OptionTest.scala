@@ -5,18 +5,19 @@ package learn.plain
   */
 object OptionTest {
 
-//
-//  def main(args: Array[String]): Unit = {
+
+  def main(args: Array[String]): Unit = {
 //    for {
-//     input <- List(Some("SomeTesxt"), None)
+//      input <- List(Some("SomeTesxt"), None)
 //    } yield {
 //      println(
 //        input + " " +
-//        input.collect {
-//          case in => ":" + in + ":"
-//        }
+//          input.collect {
+//            case in => ":" + in + ":"
+//          }
 //      )
 //    }
+  }
 //
 //    implicit val ev: Int <:< Option[String] = { def apply(x: Int): Option[String] = Some("Input: " + x)  }
 //    val none: Some[String] = none
