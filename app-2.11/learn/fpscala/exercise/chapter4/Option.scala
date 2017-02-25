@@ -1,6 +1,8 @@
 package learn.fpscala.exercise.chapter4
 
-import scala.{Option => _, Some => _, Either => _, _} // hide std library `Option`, `Some` and `Either`, since we are writing our own in this chapter
+import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
+import scala.{Either => _, Option => _, Some => _, _} // hide std library `Option`, `Some` and `Either`, since we are writing our own in this chapter
 
 sealed trait Option[+A] {
   def map[B](f: A => B): Option[B] = this match {
@@ -45,11 +47,66 @@ object Option {
     if (xs.isEmpty) None
     else Some(xs.sum / xs.length)
 
-  def variance(xs: Seq[Double]): Option[Double] = ???
+  def variance(xs: Seq[Double]): Option[Double] =
+    mean(xs) flatMap (m => mean(xs.map(x => math.pow(x - m, 2))))
 
-  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = ???
 
-  def sequence[A](a: List[Option[A]]): Option[List[A]] = ???
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    for {
+      aa <- a
+      bb <- b
+    } yield (f(aa, bb))
 
-  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = ???
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = {
+    val buf = ListBuffer[A]()
+    @tailrec
+    def go(a: List[Option[A]]): Unit = a match {
+      case Some(x) :: xs => {
+        buf += x
+        go(xs)
+      }
+      case _ =>
+    }
+    go(a)
+    if(buf.size == a.size) Some(List(buf.toList: _*))
+    else None
+  }
+  def sequence2[A](a: List[Option[A]]): Option[List[A]] = {
+    @tailrec
+    def go(a: List[Option[A]], res: Option[List[A]]): Option[List[A]] = a match {
+      case Some(x) :: xs => go(xs, res.map(_ ::: List(x)))
+      case None :: _ => None
+      case _ => res
+    }
+    go(a, Some(Nil))
+  }
+
+  def sequence3[A](a: List[Option[A]]): Option[List[A]] =
+    a match {
+      case Nil => Some(Nil)
+//    In case of any none sequence3(t) is going to be None - re everything is going to be None then
+      case h :: t => h flatMap (hh => sequence3(t) map (hh :: _))
+    }
+
+  /*
+  It can also be implemented using `foldRight` and `map2`. The type annotation on `foldRight` is needed here; otherwise
+  Scala wrongly infers the result type of the fold as `Some[Nil.type]` and reports a type error (try it!). This is an
+  unfortunate consequence of Scala using subtyping to encode algebraic data types.
+  */
+  def sequence4[A](a: List[Option[A]]): Option[List[A]] =
+    a.foldRight[Option[List[A]]](Some(Nil))((x,y) => {println("hop"); map2(x,y)(_ :: _)})
+
+  def traverseMy[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a match {
+    case x :: xs => f(x).flatMap(aa => traverse(xs)(f).map(aa :: _))
+    case Nil => Some(Nil)
+  }
+
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+    a match {
+      case Nil => Some(Nil)
+      case h::t => map2(f(h), traverse(t)(f))(_ :: _)
+    }
+
+  def traverse_1[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+    a.foldRight[Option[List[B]]](Some(Nil))((h,t) => map2(f(h),t)(_ :: _))
 }
