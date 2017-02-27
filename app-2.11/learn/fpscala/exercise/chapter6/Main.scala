@@ -20,5 +20,9 @@ object Main {
     println{
       "ints: " + RNG.ints(10)(Simple(1))
     }
+    println("-----------------------------------")
+    println{
+      "doubleViaMap: " + RNG.doubleViaMap(Simple(1))
+    }
   }
 }

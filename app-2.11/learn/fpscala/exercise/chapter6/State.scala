@@ -44,6 +44,9 @@ object RNG {
     (x / (Int.MaxValue.toDouble + 1), gen)
   }
 
+  def doubleViaMap: Rand[Double] = map(nonNegativeInt)(_ / (Int.MaxValue.toDouble + 1))
+
+
   def intDouble(rng: RNG): ((Int,Double), RNG) = {
     val (first, gen1) = rng.nextInt
     val (second, gen2) = double(gen1)
@@ -69,9 +72,38 @@ object RNG {
     })
   }
 
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    (rng1) => {
+      val (a, rng2) = ra(rng1)
+      val (b, rng3) = rb(rng2)
+      (f(a, b), rng3)
+    }
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
+  def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = map2(ra, rb)((_, _))
+
+  def randIntDouble: Rand[(Int, Double)] = both(int, double)
+
+  def sequenceRec[A](fs: List[Rand[A]]): Rand[List[A]] = (rng1) => fs match {
+    case x :: xs => {
+      val (v, rng2) = x(rng1)
+      val tmp = sequenceRec(xs)(rng2)
+      (v :: tmp._1, tmp._2)
+    }
+    case _ => (Nil, rng1)
+  }
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = (rng1) => fs.foldLeft((Nil: List[A], rng1)){
+    case ((res, rng2), x) => {
+      val (v, rng3) = x(rng2)
+      (v :: res, rng3)
+    }
+  }
+
+  //Clever stuff:
+  def sequenceBook[A](fs: List[Rand[A]]): Rand[List[A]] =
+    fs.foldRight(unit(List[A]()))((f: Rand[A], acc: Rand[List[A]]) => map2(f, acc)(_ :: _))
+
+  def intsViaSequence(count: Int): Rand[List[Int]] = sequence(List.fill(count)(int))
 
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
 }
