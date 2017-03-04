@@ -24,5 +24,8 @@ object Main {
     println{
       "doubleViaMap: " + RNG.doubleViaMap(Simple(1))
     }
+    println{
+      "nonNegativeLessThan: " + RNG.nonNegativeLessThan(24)(Simple(1))
+    }
   }
 }
