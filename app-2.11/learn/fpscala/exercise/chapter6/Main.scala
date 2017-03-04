@@ -27,5 +27,11 @@ object Main {
     println{
       "nonNegativeLessThan: " + RNG.nonNegativeLessThan(24)(Simple(1))
     }
+    val machine = Machine(true, 5, 10)
+    val st: State[Machine, (Int, Int)] = State.simulateMachine(List[Input](Coin, Turn, Coin, Turn, Coin, Turn, Coin, Turn))
+
+    println{
+      "machineTest: " + st.run(machine)
+    }
   }
 }
