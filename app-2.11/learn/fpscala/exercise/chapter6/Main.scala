@@ -3,6 +3,9 @@ package learn.fpscala.exercise.chapter6
 import learn.fpscala.exercise.chapter6.RNG.Simple
 
 object Main {
+  self =>
+  println(self + " vs " + this)
+
 
   def main(args: Array[String]): Unit = {
     println{

@@ -10,11 +10,13 @@ scalaVersion := "2.11.8"
 
 val akkaVersion = "2.4.11"
 
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
   "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided",
   "com.softwaremill.macwire" %% "util" % "2.2.5",
-  "com.softwaremill.macwire" %% "proxy" % "2.2.5"
+  "com.softwaremill.macwire" %% "proxy" % "2.2.5",
+  "org.scalaz" %% "scalaz-core" % "7.2.9"
 )
 
 scalacOptions ++= Seq(
