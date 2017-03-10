@@ -2,6 +2,7 @@ package learn.fpscala
 
 import java.util.concurrent.{Executors, TimeUnit}
 
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -23,6 +24,16 @@ object Pierdoly {
   def repeat(in: String): String = s"$in$in"
 
   def main(args: Array[String]): Unit = {
+    var listOfOptions: Seq[Option[Int]] = ArrayBuffer(Some(11))
+    val listOfSomes: Seq[Some[Int]] = ArrayBuffer(Some(11))
+
+    listOfOptions = listOfSomes;
+
+    val res: Seq[Option[Int]] = None +: listOfOptions
+    val res2: Seq[Option[Int]] = Some(12) +: listOfOptions
+    println("Res: " + res)
+
+
     val singleThread = Executors.newSingleThreadScheduledExecutor()
     singleThread.submit(new Runnable{
       override def run(): Unit = {
