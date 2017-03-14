@@ -1,14 +1,17 @@
 package learn.fpscala.exercise.chapter6
 
-
-
 trait RNG {
   def nextInt: (Int, RNG) // Should generate a random `Int`. We'll later define other functions in terms of `nextInt`.
 }
 
 object RNG {
 
-  // NB - this was called SimpleRNG in the book text
+  type Rand[+A] = RNG => (A, RNG)
+
+  implicit class RNGOps(r: RNG) {
+    def intDouble = RNG.intDouble(r)
+
+  }
 
   case class Simple(seed: Long) extends RNG {
     def nextInt: (Int, RNG) = {
@@ -21,46 +24,33 @@ object RNG {
     }
   }
 
-  type Rand[+A] = RNG => (A, RNG)
-
-  val int: Rand[Int] = _.nextInt
-
-  def unit[A](a: A): Rand[A] =
-    rng => (a, rng)
-
-  def map[A, B](s: Rand[A])(f: A => B): Rand[B] =
-    rng => {
-      val (a, rng2) = s(rng)
-      (f(a), rng2)
-    }
-
-  def nonNegativeInt(rng: RNG): (Int, RNG) = {
-    val (nextVal, nextRng) = rng.nextInt
-    (Math.abs(nextVal), nextRng)
+  def nonNegativeIntMy(rng: RNG): (Int, RNG) = {
+    // Rand[Int]
+    val (res, gen) = rng.nextInt
+    if (res == Int.MinValue) (-(Int.MinValue + 1), gen)
+    else if (res < 0) (-res, gen)
+    else (res, gen)
   }
 
-  def nonNegativeIntBook(rng: RNG): (Int, RNG) = {
+  def nonNegativeInt: Rand[Int] = { rng =>
     val (i, r) = rng.nextInt
     (if (i < 0) -(i + 1) else i, r)
   }
 
-  def double(rng: RNG): (Double, RNG) = {
-    val (x, gen) = nonNegativeIntBook(rng)
-    (x / (Int.MaxValue.toDouble + 1), gen)
+  def doubleOld(rng: RNG): (Double, RNG) = {
+    val (i, r) = nonNegativeInt(rng)
+    (i.toDouble / Int.MaxValue, r)
   }
 
-  def doubleViaMap: Rand[Double] = map(nonNegativeInt)(_ / (Int.MaxValue.toDouble + 1))
-
-
   def intDouble(rng: RNG): ((Int, Double), RNG) = {
-    val (first, gen1) = rng.nextInt
-    val (second, gen2) = double(gen1)
-    ((first, second), gen2)
+    val (i, r2) = rng.nextInt
+    val (d, r3) = double(r2)
+    ((i, d), r3)
   }
 
   def doubleInt(rng: RNG): ((Double, Int), RNG) = {
-    val ((newInt, newDouble), newGen) = intDouble(rng)
-    ((newDouble, newInt), newGen)
+    val (id, r) = rng.intDouble
+    (id.swap, r)
   }
 
   def double3(rng: RNG): ((Double, Double, Double), RNG) = {
@@ -70,123 +60,98 @@ object RNG {
     ((d1, d2, d3), r3)
   }
 
-  def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
-    (0 until count).foldLeft((List[Int](), rng))((acc, _) => {
-      val (i, rng) = acc._2.nextInt
-      (i :: acc._1, rng)
-    })
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) =
+    if (count == 0) (List(), rng)
+    else {
+      val (i, r) = rng.nextInt
+      val (l, r2) = ints(count - 1)(r)
+      (i :: l, r2)
+    }
+
+  val int: Rand[Int] = _.nextInt
+
+  def unit[A](a: A): Rand[A] = (a, _)
+
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => {
+    val (a, r) = s(rng)
+    (f(a), r)
   }
 
+  def double: Rand[Double] = map(nonNegativeInt)(_.toDouble / Int.MaxValue)
+
+  def nonNegativeEven: Rand[Int] = map(nonNegativeInt)(i => i - i % 2)
+
   def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
-    (rng1) => {
-      val (a, rng2) = ra(rng1)
-      val (b, rng3) = rb(rng2)
-      (f(a, b), rng3)
+    rng => {
+      val (a, r1) = ra(rng)
+      val (b, r2) = rb(r1)
+      (f(a, b), r2)
     }
 
   def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = map2(ra, rb)((_, _))
 
-  def randIntDouble: Rand[(Int, Double)] = both(int, double)
+  def _intDouble: Rand[(Int, Double)] = both(int, double)
 
-  def sequenceRec[A](fs: List[Rand[A]]): Rand[List[A]] = (rng1) => fs match {
-    case x :: xs => {
-      val (v, rng2) = x(rng1)
-      val tmp = sequenceRec(xs)(rng2)
-      (v :: tmp._1, tmp._2)
-    }
-    case _ => (Nil, rng1)
-  }
+  def _DoubleInt: Rand[(Double, Int)] = map(_intDouble)(_.swap)
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = (rng1) => fs.foldLeft((Nil: List[A], rng1)) {
-    case ((res, rng2), x) => {
-      val (v, rng3) = x(rng2)
-      (v :: res, rng3)
-    }
-  }
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+  //fs.foldLeft(unit(Nil: List[A]))(map2(_, _)(_ :+ _))
+    fs.foldRight(unit(Nil: List[A]))(map2(_, _)(_ :: _))
 
-  //Clever stuff:
-  def sequenceBook[A](fs: List[Rand[A]]): Rand[List[A]] =
-    fs.foldRight(unit(List[A]()))((f: Rand[A], acc: Rand[List[A]]) => map2(f, acc)(_ :: _))
 
-  def intsViaSequence(count: Int): Rand[List[Int]] = sequence(List.fill(count)(int))
+  def _ints(count: Int): Rand[List[Int]] = sequence(List.fill(count)(int))
 
-  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rnd => {
-    val (a, rng2) = f(rnd)
-    g(a)(rng2)
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rng => {
+    val (a, r1) = f(rng)
+    g(a)(r1)
   }
 
   def nonNegativeLessThan(n: Int): Rand[Int] = {
     flatMap(nonNegativeInt) { i =>
       val mod = i % n
-      if(i + (n -1) - mod >= 0) unit(mod) else nonNegativeLessThan(n)
+      if (i + (n - 1) - mod >= 0) unit(mod) else nonNegativeLessThan(n)
     }
   }
 
-  def mapViaFlatMap[A, B](f: Rand[A])(g: A => B): Rand[B] =
-    flatMap(f) { a => unit(g(a))}
+  def _map[A, B](r: Rand[A])(f: A => B): Rand[B] = flatMap(r)(a => unit(f(a)))
 
-  def map2ViaFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
-    flatMap(ra) { a => {
-//      flatMap(rb) { b => unit(f(a, b)) }
-      map(rb) { b => f(a, b)}
-    }
-    }
-  }
+  def _map2[A, B, C](a: Rand[A], b: Rand[B])(f: (A, B) => C): Rand[C] = flatMap(a)(a => map(b)(b => f(a, b)))
+
+  //flatMap(ra)(a => map(rb)(b => f(a, b)))
+
+
 }
 
+
 case class State[S, +A](run: S => (A, S)) {
+  //map2 sequence
+
   def map[B](f: A => B): State[S, B] =
     flatMap(a => State.unit(f(a)))
 
-  def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
-    flatMap(a => sb.map(b => f(a, b)))
+  def map2[B, C](s: State[S, B])(f: (A, B) => C): State[S, C] =
+      flatMap(a => s.map(b => f(a,b)))
+
+  def _map2[B, C](rb: State[S, B])(f: (A, B) => C): State[S, C] =
+    for {
+      a <-  this
+      b <-  rb
+    }yield (f(a,b))
 
   def flatMap[B](f: A => State[S, B]): State[S, B] = State(s => {
-    val (a, s1) = run(s)
-    f(a).run(s1)
+    val (a, b) = run(s)
+    f(a).run(b)
   })
+
 }
-
-sealed trait Input
-
-case object Coin extends Input
-
-case object Turn extends Input
-
-case class Machine(locked: Boolean, candies: Int, coins: Int)
 
 object State {
   type Rand[A] = State[RNG, A]
 
-  def unit[S, A](a: A): State[S, A] =
-    State(s => (a, s))
+  def unit[S, A](a: A): State[S, A] = State(s => (a, s))
 
-  // The idiomatic solution is expressed via foldRight
-  def sequenceViaFoldRight[S,A](sas: List[State[S, A]]): State[S, List[A]] =
-    sas.foldRight(unit[S, List[A]](List()))((f, acc) => f.map2(acc)(_ :: _))
-
-  // This implementation uses a loop internally and is the same recursion
-  // pattern as a left fold. It is quite common with left folds to build
-  // up a list in reverse order, then reverse it at the end.
-  // (We could also use a collection.mutable.ListBuffer internally.)
-  def sequence[S, A](sas: List[State[S, A]]): State[S, List[A]] = {
-    def go(s: S, actions: List[State[S,A]], acc: List[A]): (List[A],S) =
-      actions match {
-        case Nil => (acc.reverse,s)
-        case h :: t => h.run(s) match { case (a,s2) => go(s2, t, a :: acc) }
-      }
-    State((s: S) => go(s,sas,List()))
-  }
-
-  // We can also write the loop using a left fold. This is tail recursive like the
-  // previous solution, but it reverses the list _before_ folding it instead of after.
-  // You might think that this is slower than the `foldRight` solution since it
-  // walks over the list twice, but it's actually faster! The `foldRight` solution
-  // technically has to also walk the list twice, since it has to unravel the call
-  // stack, not being tail recursive. And the call stack will be as tall as the list
-  // is long.
-  def sequenceViaFoldLeft[S,A](l: List[State[S, A]]): State[S, List[A]] =
-  l.reverse.foldLeft(unit[S, List[A]](List()))((acc, f) => f.map2(acc)( _ :: _ ))
+  def sequence[S, A](sas: List[State[S, A]]): State[S, List[A]] =
+    sas.foldLeft(unit[S, List[A]](Nil))((acc, x) => x.map2(acc)(_ :: _))
 
   def modify[S](f: S => S): State[S, Unit] = for {
     s <- get // Gets the current state and assigns it to `s`.
@@ -197,32 +162,26 @@ object State {
 
   def set[S](s: S): State[S, Unit] = State(_ => ((), s))
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = State(machine => {
-    val fState: Machine = inputs.foldLeft(machine)((m, in) => in match {
-      case Coin => insertCoin(m)
-      case Turn => turnKnob(m)
-    })
-    ((fState.coins, fState.candies), fState)
-  })
+  sealed trait Input
+  case object Coin extends Input
+  case object Turn extends Input
 
-  def insertCoin(m: Machine) = if(m.locked && m.candies > 0) m.copy(locked = false, coins = m.coins +1) else m
+  case class Machine(locked: Boolean, candies: Int, coins: Int)
 
-  def turnKnob(m: Machine) = if(!m.locked && m.candies > 0) m.copy(locked = true, candies = m.candies - 1) else m
+  object Candy {
+    def update: (Input) => (Machine) => Machine = (i: Input) => (s: Machine) =>
+      (i, s) match {
+        case (_, Machine(_, 0, _)) => s
+        case (Coin, Machine(false, _, _)) => s
+        case (Turn, Machine(true, _, _)) => s
+        case (Coin, Machine(true, candy, coin)) => Machine(false, candy, coin + 1)
+        case (Turn, Machine(false, candy, coin)) => Machine(true, candy - 1, coin)
+      }
 
-  def update = (i: Input) => (s: Machine) =>
-    (i, s) match {
-      case (_, Machine(_, 0, _)) => s
-      case (Coin, Machine(false, _, _)) => s
-      case (Turn, Machine(true, _, _)) => s
-      case (Coin, Machine(true, candy, coin)) =>
-        Machine(false, candy, coin + 1)
-      case (Turn, Machine(false, candy, coin)) =>
-        Machine(true, candy - 1, coin)
-    }
-
-  def simulateMachine2(inputs: List[Input]): State[Machine, (Int, Int)] = for {
-    _ <- sequence(inputs map (modify[Machine] _ compose update))
-    s <- get
-  } yield (s.coins, s.candies)
-
+    def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
+      _ <- sequence(inputs map (modify[Machine] _ compose update))
+      s <- get
+    } yield (s.coins, s.candies)
+  }
 }
+
