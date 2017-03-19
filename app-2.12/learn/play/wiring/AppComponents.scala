@@ -4,10 +4,12 @@ import play.api.ApplicationLoader.Context
 import play.api._
 import com.softwaremill.macwire._
 import learn.play.controllers.{AsyncController, Greetings}
-import router.Routes
+
+
+//import router.Routes
 
 class AppComponents(context: Context)
-  extends BuiltInComponentsFromContext(context) {
+  extends BuiltInComponentsFromContext(context) with play.filters.HttpFiltersComponents  {
 
   private implicit def as = actorSystem
 
@@ -17,6 +19,6 @@ class AppComponents(context: Context)
 
   // Router
   private lazy val routePrefix: String = "/"
-  lazy val router = wire[Routes]
+  lazy val router = null
 
 }

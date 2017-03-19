@@ -1,11 +1,11 @@
 package learn.play.controllers
 
 import akka.actor.ActorSystem
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, Action, Controller, ControllerComponents}
 
 import scala.concurrent.Future
 
-class Greetings(implicit actorSystem: ActorSystem) extends Controller {
+class Greetings(components: ControllerComponents)(implicit actorSystem: ActorSystem)  extends AbstractController(components) {
 
   import actorSystem.dispatcher
 

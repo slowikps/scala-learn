@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by slowikps on 15/01/17.
   */
-class AsyncController (implicit actorSystem: ActorSystem) extends Controller {
+class AsyncController (components: ControllerComponents)(implicit actorSystem: ActorSystem)  extends AbstractController(components) {
 
   def message = Action.async {
     getFutureMessage(1.second).map { msg => Ok(msg) }

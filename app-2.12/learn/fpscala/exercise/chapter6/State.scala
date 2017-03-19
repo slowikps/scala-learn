@@ -81,6 +81,8 @@ object RNG {
 
   def nonNegativeEven: Rand[Int] = map(nonNegativeInt)(i => i - i % 2)
 
+  def boolean: Rand[Boolean] = map(nonNegativeInt)(_ % 2 == 0)
+
   def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
     rng => {
       val (a, r1) = ra(rng)
@@ -118,7 +120,6 @@ object RNG {
   def _map2[A, B, C](a: Rand[A], b: Rand[B])(f: (A, B) => C): Rand[C] = flatMap(a)(a => map(b)(b => f(a, b)))
 
   //flatMap(ra)(a => map(rb)(b => f(a, b)))
-
 
 }
 
