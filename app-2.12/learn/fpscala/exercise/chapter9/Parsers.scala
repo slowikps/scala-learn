@@ -4,9 +4,8 @@ import learn.fpscala.exercise.chapter8.{Gen, Prop}
 
 import scala.util.matching.Regex
 
-trait Parsers[ParseError, Parser[+ _]] {
-  self =>
-
+trait Parsers[ParseError, Parser[+ _]] { self =>
+  //Parser[+_] ????? Scala syntax for a type parameter that is itself a type constructor.?????
   def run[A](p: Parser[A])(input: String): Either[ParseError, A]
 
   //Recognizes and return a single String

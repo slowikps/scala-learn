@@ -2,6 +2,8 @@ name := "scala-learn"
 
 version := "1.0"
 
+resolvers += "Sonatype OSS Snapshots" at
+  "https://oss.sonatype.org/content/repositories/releases"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 enablePlugins(DockerPlugin)
@@ -19,7 +21,8 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.2.9",
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
+  "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
+  "com.storm-enroute" %% "scalameter" % "0.8.2"
 )
 
 scalacOptions ++= Seq(

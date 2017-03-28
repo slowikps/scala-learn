@@ -1,6 +1,6 @@
 package property.based.testing.fps
 
-import learn.fpscala.exercise.chapter10.Monoid
+import learn.fpscala.exercise.chapter10.{Monoid, ParallelParsin}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
@@ -34,6 +34,12 @@ class MonoidSpec extends PropSpec with GeneratorDrivenPropertyChecks with Matche
   val intMultiplicationLawTest = monoidLaws(intMultiplication)
   val booleanAndLawTest = monoidLaws(booleanAnd)
   val booleanOrLawTest = monoidLaws(booleanOr)
+
+  //Start Not Monoids
+//  val isOrderedMonoidLawTest = monoidLaws(isOrderedMonoid)
+//  val isOrderedMonoidBookLawTest = monoidLaws(isOrderedMonoidBook)
+  //End Not Monoids
+//  val wcMonoidLawTest = monoidLaws(ParallelParsin.wcMonoid)
 
   def monoidLaws[A](m: Monoid[A])(implicit g: Arbitrary[A]) = {
     print("Opppa")
