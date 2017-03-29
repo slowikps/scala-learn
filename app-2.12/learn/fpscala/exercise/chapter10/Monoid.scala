@@ -8,6 +8,34 @@ trait Monoid[A] {
 
 object Monoid {
 
+  //TODO: Interesting
+  def mapMergeMonoid[K,V](V: Monoid[V]): Monoid[Map[K,V]] =
+    new Monoid[Map[K, V]] {
+      override def op(a: Map[K, V], b: Map[K, V]): Map[K, V] =
+        (a.keySet ++ b.keySet).foldLeft(zero){ (acc, k) =>
+          acc.updated(k, V.op(a.getOrElse(k ,V.zero),
+            b.getOrElse(k, V.zero)))
+
+        }
+
+      override def zero: Map[K, V] = Map()
+    }
+
+  def functionMonoid[A, B](B: Monoid[B]): Monoid[A => B] = new Monoid[(A) => B] {
+    override def op(f1: (A) => B, f2: (A) => B): (A) => B = a => B.op(f1(a), f2(a))
+    override def zero: (A) => B = _ => B.zero
+  }
+
+  def bag[A](as: IndexedSeq[A]): Map[A, Int] =
+    foldMapV(as, mapMergeMonoid[A, Int](intAddition))(key => Map(key -> 1))
+    
+
+
+
+
+  //End Interesting
+
+
   def foldMap[A, B](as: List[A], m: Monoid[B])(f: A => B): B =
     as.map(f).foldLeft(m.zero)((acc, x) => m.op(acc, x))
 

@@ -17,6 +17,27 @@ trait Foldable[F[_]] { //F is a type constructor which takes one type argument -
   def foldMap[A, B](as: F[A])(f: A => B)(mb: Monoid[B]): B = foldRight(as)(mb.zero)((a, b) => mb.op(f(a), b))
 
   def concatenate[A](as: F[A])(m: Monoid[A]): A = foldLeft(as)(m.zero)(m.op)
+
+
+  def toList[A](fa: F[A]): List[A] = foldRight(fa)(List[A]())(_ :: _)
+
+  def productMonoid[A, B](a: Monoid[A], b: Monoid[B]): Monoid[(A, B)] = new Monoid[(A, B)] {
+
+    override def op(a1: (A, B), a2: (A, B)): (A, B) = (a.op(a1._1, a2._1), b.op(a1._2, a2._2))
+    override def zero: (A, B) = (a.zero, b.zero)
+  }
+}
+
+
+object FoldableOption extends Foldable[Option] {
+  //Book is using patter matching here
+  override def foldRight[A, B](as: Option[A])(z: B)(f: (A, B) => B): B =
+    as.map(a => f(a, z)).getOrElse(z)
+
+  override def foldLeft[A, B](as: Option[A])(z: B)(f: (B, A) => B): B = foldRight(as)(z)((a, b) => f(b, a))
+
+  override def foldMap[A, B](as: Option[A])(f: (A) => B)(mb: Monoid[B]): B = as.map(f).getOrElse(mb.zero)
+
 }
 
 object TreeFoldable extends Foldable[Tree] {
