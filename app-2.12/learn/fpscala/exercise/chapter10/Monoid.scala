@@ -28,7 +28,7 @@ object Monoid {
 
   def bag[A](as: IndexedSeq[A]): Map[A, Int] =
     foldMapV(as, mapMergeMonoid[A, Int](intAddition))(key => Map(key -> 1))
-    
+
 
 
 
