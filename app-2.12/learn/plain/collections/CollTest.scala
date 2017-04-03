@@ -6,6 +6,14 @@ package learn.plain.collections
 object CollTest {
 
   def main(args: Array[String]): Unit = {
+    println(
+      "(1 until 10).toList: " + (1 until 10).toList
+    )
+
+    println(
+      "(1 to 10).toList: " + (1 to 10).toList
+    )
+
     println {
       List(1, 2, 3, 4, 5).foldLeft(0) {
         (acc, x) => {

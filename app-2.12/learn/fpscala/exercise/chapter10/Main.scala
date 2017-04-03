@@ -7,7 +7,26 @@ import scala.collection.mutable.ArrayBuffer
   */
 object Main {
 
+  def monadMain() = {
+    println("Enter monad part")
+    println(
+      Monad.optionMonad.filterMBook(List(1,2,3,4))(_ => Some(true)) == Monad.optionMonad.filterM(List(1,2,3,4))(_ => Some(true))
+    )
+    println(
+      Monad.optionMonad.filterMBook(List(1,2,3,4))(_ => Some(true))
+    )
+    println(
+        Monad.listMonda.filterMBook(List(1,2,3,4))(_ => List(true, false)) == Monad.listMonda.filterM(List(1,2,3,4))(_ => List(true, false))
+    )
+    println(
+        Monad.listMonda.filterMBook(List(1,2,3,4))(_ => List(false, true))
+    )
+    println("Exit monad part")
+  }
+
   def main(args: Array[String]): Unit = {
+    monadMain()
+
     val in = List(1,2,3)
 
     println(
