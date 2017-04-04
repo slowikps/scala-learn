@@ -22,7 +22,7 @@ class HelloWorld extends Actor {
 
     val res = greeter ? Greeter.WaitingForReplay //This is not the preferable way of sending messages
     res.mapTo[Double].map(in => println(s"The result is: $in"))
-    () //Achh 
+    () //Achh
   }
 
   def receive = {

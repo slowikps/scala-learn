@@ -1,5 +1,4 @@
-package learn.fpscala.exercise.chapter10
-
+package learn.fpscala.exercise.chapter11
 
 trait Monad[F[_]] {
 

@@ -1,5 +1,7 @@
 package learn.fpscala.exercise.chapter10
 
+import learn.fpscala.exercise.chapter11.Monad
+
 import scala.collection.mutable.ArrayBuffer
 
 /**
