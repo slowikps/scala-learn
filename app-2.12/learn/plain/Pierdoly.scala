@@ -5,6 +5,10 @@ package learn.plain
   */
 object Pierdoly {
   def main(args: Array[String]): Unit = {
+    println{
+      "123456789".substring(0, 9)
+    }
+
     println {
       List(1,2,3,4) zip List("A" , "B")
     }

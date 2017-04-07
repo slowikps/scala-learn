@@ -5,8 +5,36 @@ package learn.plain
   */
 object OptionTest {
 
+  def getOption(con: Boolean) = if(con) Some(11) else None
 
   def main(args: Array[String]): Unit = {
+    println(
+      "Option of null: " + Option(null)
+    )
+
+    println("With <- and j " +
+      (for {
+        i <- Option(11)
+        j <- getOption(false)
+      } yield (i))
+    )
+
+    println("With <- and _ " +
+      (for {
+        i <- Option(11)
+        _ <- getOption(false)
+      } yield (i))
+    )
+
+    println("With <- and _ (and success) " +
+      (for {
+        i <- Option(11)
+        _ <- getOption(true)
+      } yield (i))
+    )
+
+
+
 //    for {
 //      input <- List(Some("SomeTesxt"), None)
 //    } yield {

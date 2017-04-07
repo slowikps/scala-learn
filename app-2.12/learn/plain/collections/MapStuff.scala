@@ -6,7 +6,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object MapStuff extends App {
 
   val m = Map(1 -> "jeden", 2 -> "dwa")
-
+  Set(1,2,3).par
+  m(3)
 //  println(
 //    for{
 //      nr <- 1 to 10
