@@ -24,10 +24,15 @@ object Pierdoly {
   def repeat(in: String): String = s"$in$in"
 
   def main(args: Array[String]): Unit = {
+    val s1 = Some(1)
+    val s2 = Some(2)
+    val res: Option[Option[Int]] = s1.map(r1 => s2.map(r1 + _))
+
+
     var listOfOptions: Seq[Option[Int]] = ArrayBuffer(Some(11))
     val listOfSomes: Seq[Some[Int]] = ArrayBuffer(Some(11))
 
-    listOfOptions = listOfSomes;
+    listOfOptions = listOfSomes
 
     val res: Seq[Option[Int]] = None +: listOfOptions
     val res2: Seq[Option[Int]] = Some(12) +: listOfOptions
