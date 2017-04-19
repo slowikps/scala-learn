@@ -34,7 +34,7 @@ object Pierdoly {
 
     listOfOptions = listOfSomes
 
-    val res: Seq[Option[Int]] = None +: listOfOptions
+    val res3: Seq[Option[Int]] = None +: listOfOptions
     val res2: Seq[Option[Int]] = Some(12) +: listOfOptions
     println("Res: " + res)
 

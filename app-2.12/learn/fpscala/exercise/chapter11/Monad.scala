@@ -23,6 +23,11 @@ trait Monad[F[_]] {
 
   def replicateM[A](n: Int, ma: F[A]): F[List[A]] = (1 until n).foldLeft(unit(List[A]()))((acc, _) => map2(ma, acc)(_ :: _))
 
+  def forever[A, B](a: F[A]): F[B] = {
+    lazy val t: F[B] = forever(a)
+    flatMap(a)(_ => t)
+  }
+
   //List.fill(n)(ma) better than my stupid 1 unit n
 
   // Recursive version:

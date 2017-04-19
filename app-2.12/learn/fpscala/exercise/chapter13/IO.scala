@@ -23,12 +23,11 @@ object IO extends Monad[IO] {
   }
 
   def apply[A](a: => A): IO[A] = unit(a) //This makes MyIO a worse version of above
+
+  def PrintLine(msg: String): IO[Unit] = IO{println(msg)}
 }
 
 class MyIO[A](run: => A) { self =>
-
   def map[B](f: A => B): MyIO[B] = new MyIO(f(self.run))
-
   def flatMap[B](f: A => IO[B]): MyIO[B] = new MyIO(f(self.run).run)
-
 }
