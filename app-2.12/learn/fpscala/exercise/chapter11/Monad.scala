@@ -25,7 +25,16 @@ trait Monad[F[_]] {
 
   def forever[A, B](a: F[A]): F[B] = {
     lazy val t: F[B] = forever(a)
-    flatMap(a)(_ => t)
+    flatMap(a)(_ => t) //Ta część jest zryta dla IO monad. Wygląda jakby to była nieskończona rekurencja == stackoverflow ale druga częśc przekzywana jest jako lamgda do nowej instancji obiektu FlatMap
+  }
+
+  def foreverDupa[A, B](a: F[A]): F[B] = {
+    def innerForever(a: F[A], level: Int): F[B] = {
+      println(level)
+      lazy val t: F[B] = innerForever(a, level + 1)
+      flatMap(a)(_ => t)
+    }
+    innerForever(a, 0)
   }
 
   //List.fill(n)(ma) better than my stupid 1 unit n
