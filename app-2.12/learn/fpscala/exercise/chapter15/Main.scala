@@ -18,5 +18,15 @@ object Main extends App {
     Process.sum(Stream(1, 2, 3)).toList
   )
 
+  println(
+    "3 elements - take 4: " + Process.take(4)(Stream(1, 2, 3)).toList +
+      "         7 elements - take 4: " + Process.take(4)(Stream(1, 2, 3, 4, 5, 6, 7)).toList
+  )
+
+  println(
+    "3 elements - drop 4: " + Process.drop(4)(Stream(1, 2, 3)).toList +
+      "         7 elements - drop 4: " + Process.drop(4)(Stream(1, 2, 3, 4, 5, 6, 7)).toList
+  )
+
 
 }

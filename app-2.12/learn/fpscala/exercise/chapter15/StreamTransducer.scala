@@ -34,6 +34,8 @@ object Process {
       case None => Halt()
     }
 
+  def id[I]: Process[I,I] = lift(identity)
+
   def filter[I](p: I => Boolean): Process[I, I] =
     Await[I, I] {
       case Some(i) if p(i) => Emit[I, I](i)
@@ -49,6 +51,29 @@ object Process {
 
     go(0.0)
   }
+
+  def await[I, O](f: I => Process[I, O],
+                  fallback: Process[I, O] = Halt[I, O]()): Process[I, O] =
+    Await[I, O] {
+      case Some(i) => f(i)
+      case None => fallback
+    }
+
+  def emit[I, O](h: O, t: Process[I, O] = Halt[I, O]()): Process[I, O] = Emit(h, t)
+
+  def takeBook[I](n: Int): Process[I, I] =
+    if (n <= 0) Halt()
+    else await(i => emit(i, take[I](n - 1))) //It's ok
+
+  def take[I](n: Int): Process[I, I] =
+    Await[I, I] {
+      case Some(i) if n > 0 => Emit[I, I](i, take(n - 1))
+      case _ => Halt()
+    }
+
+  def drop[I](n: Int): Process[I, I] =
+    if (n <= 0) id //lift(x => x)
+    else await(i => drop[I](n-1))
 }
 
 case class Emit[I, O](
