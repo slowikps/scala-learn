@@ -5,6 +5,9 @@ package learn.plain
   */
 object Pierdoly {
   def main(args: Array[String]): Unit = {
+    println {
+      java.util.UUID.fromString("ca3-f02-3-3-39")
+    }
     println{
       "123456789".substring(0, 9)
     }
