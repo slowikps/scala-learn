@@ -10,7 +10,7 @@ enablePlugins(DockerPlugin)
 
 scalaVersion := "2.12.1"
 
-val akkaVersion = "2.4.17"
+val akkaVersion = "2.5.1"
 
 
 libraryDependencies ++= Seq(
