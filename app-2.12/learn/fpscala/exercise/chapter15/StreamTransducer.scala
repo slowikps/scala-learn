@@ -34,7 +34,7 @@ object Process {
       case None => Halt()
     }
 
-  def id[I]: Process[I,I] = lift(identity)
+  def id[I]: Process[I, I] = lift(identity)
 
   def filter[I](p: I => Boolean): Process[I, I] =
     Await[I, I] {
@@ -71,9 +71,41 @@ object Process {
       case _ => Halt()
     }
 
+  def takeWhile[I](condition: I => Boolean): Process[I, I] =
+    Await[I, I] {
+      case Some(i) if condition(i) => Emit[I, I](i, takeWhile(condition))
+      case _ => Halt()
+    }
+
   def drop[I](n: Int): Process[I, I] =
     if (n <= 0) id //lift(x => x)
-    else await(i => drop[I](n-1))
+    else await(i => drop[I](n - 1))
+
+  def dropWhile[I](f: I => Boolean): Process[I, I] =
+    await(i =>
+      if (f(i)) dropWhile(f)
+      else emit(i, id))
+
+  def count[I]: Process[I, Int] = {
+    def go(from: Int): Process[I, Int] =
+      await(i =>
+        emit(from, go(from + 1))
+      )
+
+    go(0)
+  }
+
+  def mean[I]: Process[Double, Double] = {
+    def go(sum: Double, count: Double): Process[Double, Double] =
+      await((d: Double) => emit((sum + d) / (count + 1), go(sum + d, count + 1)))
+
+    go(0.0, 0.0)
+  }
+
+  def loop[S, I, O](z: S)(f: (I, S) => (O, S)): Process[I, O] =
+    await((i: I) => f(i, z) match {
+      case (o, s2) => emit(o, loop(s2)(f))
+    })
 }
 
 case class Emit[I, O](

@@ -29,4 +29,13 @@ object Main extends App {
   )
 
 
+  println(
+    "3 elements - takie while 4: " + Process.takeWhile((x: Int) => x < 3)(Stream(1, 2, 3)).toList
+  )
+  println(
+    "Process.count(Stream(1, 2, 3, 4, 5)).toList: " + Process.count(Stream(1, 2, 3, 4, 5)).toList +
+      "\nProcess.count(Stream(1)).toList: " + Process.count(Stream(1)).toList
+  )
+
+
 }
