@@ -1,12 +1,34 @@
 package learn.plain.algos
 
-/**
-  * Created by slowi on 01/02/2017.
-  */
 object LetterCount {
 
+  //1 Scala List(Some(1), Some(2)) ...
+  //2 Letter count
+  //3 Reverse Polish notation
+  //4 Cache - how to implement?
+
+  //Hash map - know the answer
   def main(args: Array[String]): Unit = {
-    println(recursive("aaBaacccccccddefgg"))
+    println(recursive("aaBaacccccccddefagagaa"))
+    println(
+      mostLetters("aaBaacccccccddefagagaa".toList)
+    )
+  }
+
+  def mostLetters(letters: List[Char]): Any = {
+    def go(letters: List[Char], letterToLength: Map[Char, Int], winner: Char): (Char, Int) = letters match {
+      case x :: xs => {
+        val winnerCount = letterToLength(winner)
+        val currentCount = letterToLength.getOrElse(x, 0) + 1
+
+        if(currentCount > winnerCount) go(xs, letterToLength.updated(x, currentCount), x)
+        else go(xs, letterToLength.updated(x, currentCount), winner)
+
+      }
+      case _ => (winner, letterToLength(winner))
+    }
+
+    go(letters.tail, Map(letters.head -> 1), letters.head)
   }
 
   def recursive(sentence: String): String = {
