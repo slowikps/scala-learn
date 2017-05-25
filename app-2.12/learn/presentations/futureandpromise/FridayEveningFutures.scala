@@ -1,15 +1,15 @@
 package learn.presentations.futureandpromise
 
 import java.util.concurrent.TimeUnit
+
+import learn.presentations.futureandpromise.utils.FancyLogging
+
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 
-object FridayEveningFutures extends App {
-  val start = System.currentTimeMillis
-
-  def info(msg: String) = printf("%.2f: %s\n", (System.currentTimeMillis - start) / 1000.0, msg)
+object FridayEveningFutures extends App with FancyLogging {
 
   def provide(name: String) = {
     TimeUnit.SECONDS.sleep(1)
@@ -19,7 +19,19 @@ object FridayEveningFutures extends App {
 
   def consume(treat: FridayTreat) = info(s"About to consume: $treat")
 
-  {//Step 2
+  //Definition First!
+  {
+    //Step 1 - ugly way
+    val futBear = Future(provide("beer"))
+    val futPizza = Future(provide("pizza"))
+    Await.result(futBear, 5 seconds)
+    Await.result(futPizza, 5 seconds)
+
+    consume(futBear.value.get.get and futPizza.value.get.get)
+  }
+
+  {
+    //Step 2 - not really working
     val treat = for {
       bear <- Future(provide("beer"))
       pizza <- Future(provide("pizza"))
@@ -28,8 +40,9 @@ object FridayEveningFutures extends App {
     Await.result(treat, 5 seconds)
   }
 
-  {//Step 3
-    val futBear  = Future(provide("beer"))
+  {
+    //Step 3
+    val futBear = Future(provide("beer"))
     val futPizza = Future(provide("pizza"))
     val treat = for {
       bear <- futBear

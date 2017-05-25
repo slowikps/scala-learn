@@ -29,6 +29,7 @@ class Parent extends Actor {
     log.info("preRestart: Parent - doing nothing")
     self ! PreRestart
   }
+
 }
 
 case object Start
