@@ -7,7 +7,7 @@ import learn.presentations.futureandpromise.utils.FancyLogging
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
-
+import scala.language.postfixOps
 
 object FridayEveningFutures extends App with FancyLogging {
 

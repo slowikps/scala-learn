@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "com.softwaremill.macwire" %% "util" % "2.2.5",
   "com.softwaremill.macwire" %% "proxy" % "2.2.5",
   "org.scalaz" %% "scalaz-core" % "7.2.9",
+  "org.typelevel" %% "cats" % "0.9.0",
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
