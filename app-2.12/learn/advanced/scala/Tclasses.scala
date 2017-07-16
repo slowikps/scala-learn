@@ -2,38 +2,26 @@ package learn.advanced.scala
 
 import java.util.concurrent.TimeUnit
 
-import cats.data.OptionT
-import cats.data.EitherT
-import learn.advanced.scala.TclassesSimple.ErrorOr
+import cats.data.{EitherT, OptionT}
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 
 object Tclasses extends App {
 
-  import cats.syntax.option._
-  import cats.syntax.either._
+  import cats.instances.future._
   import cats.syntax.applicative._
-  import scala.language.postfixOps
-  def asFutureOption[A](a: A): Future[Option[A]] =
-    Future.successful(a.some)
-
-  def asFutureOptionT[A](a: A): OptionT[Future, A] =
-    OptionT(Future.successful(a.some))
-
-  def asFutureEitherT[A](a: A): EitherT[Future, String, A] =
-    EitherT(Future.successful(a.asRight[String]))
-
-  val tmp: EitherT[Future, String, Option[Int]] = asFutureEitherT(11.some)
-
-//  type test[A] = EitherT[OptionT[Future[A],A], String, A]
+  import cats.syntax.either._
+  import cats.syntax.option._
 
   import scala.concurrent.ExecutionContext.Implicits.global
-  import cats.instances.future._
-  import scala.concurrent.duration._
+  import scala.language.postfixOps
+
   type Error = String
   type FutureEither[A] = EitherT[Future, String, A]
+  type FutureOption[A] = OptionT[Future, A]
   type FutureEitherOption[A] = OptionT[FutureEither, A]
+  type FutureOptionEither[A] = EitherT[FutureOption, Error, A]
 
   val superb: OptionT[FutureEither, Int] = OptionT[FutureEither, Int](EitherT[Future, String, Option[Int]](
     Future.successful((11.some).asRight[String])
@@ -43,31 +31,41 @@ object Tclasses extends App {
   val eitTmp2: EitherT[Future, String, Int] = EitherT(tmp2)
 
 
-
   val superbMapped = superb.map(_ + 10)
   TimeUnit.MILLISECONDS.sleep(100)
   println(superb)
   println(superbMapped)
 
   val intTheMiddle1: OptionT[Future, Int] = OptionT(Future.successful(11.some))
-//  EitherT.liftT(intTheMiddle1)
+  //  EitherT.liftT(intTheMiddle1)
 
   val inTheMiddle: EitherT[Future, String, Int] = EitherT(Future.successful(11.asRight[String]))
-//    asFutureEitherT(11)
+  //    asFutureEitherT(11)
 
   val res = for {
     a <- 11.pure[FutureEitherOption]
     b <- 12.pure[FutureEitherOption]
   } yield a + b
 
+
+  val futureOptionEither = 1.pure[FutureOptionEither]
+  val futureEitherOption = 1.pure[FutureEitherOption]
+
   TimeUnit.MILLISECONDS.sleep(100)
   println(res)
-
-  val futureOfOption: Future[Option[Int]] = Future(1.some)
+  println("futureOptionEither: " + futureOptionEither)
+  println("futureEitherOption: " + futureEitherOption)
 
   println(
-
+    "futureOptionEither.getOrElse(11): " + futureOptionEither.getOrElse(11)
   )
-//  OptionT.
 
+  TimeUnit.MILLISECONDS.sleep(100)
+  futureOptionEither.map((el: Int) => println("Map has direct access: " + el))
+  println("futureOptionEither.value: " + futureOptionEither.value)
+  println("futureOptionEither.value.value: " + futureOptionEither.value.value)
+  println("futureOptionEither.value.isDefined: " + futureOptionEither.value.isDefined)
+
+
+  TimeUnit.MILLISECONDS.sleep(100)
 }
