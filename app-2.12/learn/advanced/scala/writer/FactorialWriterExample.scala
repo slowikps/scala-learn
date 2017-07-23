@@ -24,6 +24,6 @@ object FactorialWriterExample extends App {
     } yield ans
 
   println(
-    factorial(10)
+    factorial(10).run
   )
 }

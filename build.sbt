@@ -11,10 +11,12 @@ enablePlugins(DockerPlugin)
 scalaVersion := "2.12.1"
 
 val akkaVersion = "2.5.1"
-
+val akkaHttpVersion = "10.0.6"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+  "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
+  "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
   "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided",
   "com.softwaremill.macwire" %% "util" % "2.2.5",
   "com.softwaremill.macwire" %% "proxy" % "2.2.5",

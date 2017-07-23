@@ -22,7 +22,7 @@ object PlayingWithEither extends App {
   }
 
 
-//  for {
-//
-//  }
+  val catchOnly: Either[NumberFormatException, Int] = Either.catchOnly[NumberFormatException]("foo".toInt)
+
+  val catchNonFatal: Either[Throwable, Nothing] = Either.catchNonFatal(sys.error("Badness"))
 }
