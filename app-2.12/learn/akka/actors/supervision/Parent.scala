@@ -1,6 +1,6 @@
 package learn.akka.actors.supervision
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.event.Logging
 
 
@@ -9,7 +9,13 @@ class Parent extends Actor {
   val log = Logging(context.system, this)
   log.info(s"Parent constructor [$this]")
 
-  private val son = context.actorOf(Child.props)
+  private var son: ActorRef = _
+
+
+  override def preStart(): Unit = {
+    log.info("Bang in preStart method")
+    this.son = context.actorOf(Child.props)
+  }
 
   override def receive: Receive = {
     case Start =>
@@ -27,9 +33,10 @@ class Parent extends Actor {
 
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.info("preRestart: Parent - doing nothing")
-    self ! PreRestart
+//    self ! PreRestart
+    postStop()
   }
-
+  override def postRestart(reason: Throwable): Unit = ()
 }
 
 case object Start

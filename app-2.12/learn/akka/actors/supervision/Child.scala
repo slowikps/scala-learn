@@ -14,7 +14,7 @@ class Child extends Actor {
   }
 
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    log.info(s"I am about to restart [reason: $reason, message: $message]")
+    log.info(s"I am about to restart [reason: $reason, message: $message, this: $this]")
     super.preRestart(reason: Throwable, message: Option[Any])
   }
 

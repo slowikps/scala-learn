@@ -8,13 +8,16 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 enablePlugins(DockerPlugin)
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.2"
 
-val akkaVersion = "2.5.1"
+val akkaVersion = "2.5.2"
 val akkaHttpVersion = "10.0.6"
+
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+  "com.typesafe.akka" %% "akka-typed" % akkaVersion,
+  "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
   "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
   "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided",
@@ -36,7 +39,7 @@ scalacOptions ++= Seq(
   "-language:higherKinds",
   "-language:implicitConversions",
   "-unchecked",
-  "-Xfatal-warnings",
+//  "-Xfatal-warnings", //Breaks compilation on warnings!
   "-Xlint",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",

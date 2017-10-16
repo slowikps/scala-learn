@@ -1,5 +1,9 @@
 package learn.advanced.scala.either
 
+import cats.data.EitherT
+
+import scala.concurrent.Future
+
 trait FailedValidation
 case object EmptyString extends FailedValidation
 case class SmallNumber() extends FailedValidation
@@ -21,8 +25,28 @@ object PlayingWithEither extends App {
     tmp
   }
 
+  val catchOnly: Either[NumberFormatException, Int] =
+    Either.catchOnly[NumberFormatException]("foo".toInt)
 
-  val catchOnly: Either[NumberFormatException, Int] = Either.catchOnly[NumberFormatException]("foo".toInt)
+  val catchNonFatal: Either[Throwable, Nothing] =
+    Either.catchNonFatal(sys.error("Badness"))
 
-  val catchNonFatal: Either[Throwable, Nothing] = Either.catchNonFatal(sys.error("Badness"))
+  type MyType[A] = EitherT[Future, Int, A]
+  type MyTypeError[A] = EitherT[Future, A, String]
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import cats.syntax.applicative._
+  import cats.syntax.applicativeError._
+
+  import cats.instances.future._
+  import cats.instances.either._
+  import cats.data.EitherT._
+
+  val pureTest: MyType[String] = "success".pure[MyType]
+
+  println("Pure test: " + pureTest)
+
+//  implicit val in = cats.ApplicativeError[Future, String]
+//  val test = in.raiseError("someBadError")
+//  println("Pure test: " + test)
 }
