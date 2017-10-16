@@ -34,13 +34,11 @@ object PlayingWithEither extends App {
   type MyType[A] = EitherT[Future, Int, A]
   type MyTypeError[A] = EitherT[Future, A, String]
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import cats.syntax.applicative._
-  import cats.syntax.applicativeError._
-
   import cats.instances.future._
-  import cats.instances.either._
-  import cats.data.EitherT._
+  import cats.syntax.applicative._
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
 
   val pureTest: MyType[String] = "success".pure[MyType]
 

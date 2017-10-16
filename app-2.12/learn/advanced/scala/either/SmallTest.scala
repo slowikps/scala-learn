@@ -2,21 +2,19 @@ package learn.advanced.scala.either
 
 import cats.data.EitherT
 
+
 import scala.concurrent.Future
 
-object ErrorHandling extends App {
+object SmallTest extends App {
 
-  type MyErrorType[A] = EitherT[Future, A, Int]
+  type MyType[A] = EitherT[Future, Int, A]
 
   import scala.concurrent.ExecutionContext.Implicits.global
   import cats.instances.future._
   import cats.syntax.applicative._
 
+  val pureTest: MyType[String] = "success".pure[MyType]
 
-  val err = "s"//"Big fat error".pure[MyErrorType]
-
-
-  println("The error is: " + err)
-  println("The end")
+  println("?Pure test: " + pureTest)
 
 }
