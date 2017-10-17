@@ -14,6 +14,8 @@ val akkaVersion = "2.5.2"
 val akkaHttpVersion = "10.0.6"
 
 
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
   "com.typesafe.akka" %% "akka-typed" % akkaVersion,

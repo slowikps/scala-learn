@@ -9,10 +9,12 @@ object LetterCount {
 
   //Hash map - know the answer
   def main(args: Array[String]): Unit = {
-    println(recursive("aaBaacccccccddefagagaa"))
+    val sets = Set(1, 2, 3, 4).size
+    println("Decoding: " + recursive("aaBaacccccccddefagagaa"))
     println(
-      mostLetters("aaBaacccccccddefagagaa".toList)
+      "Most letters: " + mostLetters("aaBaacccccccddefagagaa".toList)
     )
+
   }
 
   def mostLetters(letters: List[Char]): Any = {
@@ -21,7 +23,7 @@ object LetterCount {
         val winnerCount = letterToLength(winner)
         val currentCount = letterToLength.getOrElse(x, 0) + 1
 
-        if(currentCount > winnerCount) go(xs, letterToLength.updated(x, currentCount), x)
+        if (currentCount > winnerCount) go(xs, letterToLength.updated(x, currentCount), x)
         else go(xs, letterToLength.updated(x, currentCount), winner)
 
       }
@@ -32,13 +34,13 @@ object LetterCount {
   }
 
   def recursive(sentence: String): String = {
-    def innerRecursive(sentence: List[Char], letter: Char, occurencies: Int): String = sentence match {
-      case x :: xs  if x == letter => innerRecursive(xs, x, occurencies + 1)
-      case x :: xs => s"$letter$occurencies"  + innerRecursive(xs, x, 1)
-      case _ => s"$letter$occurencies"
+    def innerRecursive(sentence: List[Char], letter: Char, occurrences: Int): String = sentence match {
+      case x :: xs if x == letter => innerRecursive(xs, x, occurrences + 1)
+      case x :: xs => s"$letter$occurrences" + innerRecursive(xs, x, 1)
+      case _ => s"$letter$occurrences"
     }
 
-    if(sentence.length > 0) innerRecursive(sentence.tail.toList, sentence.head,1)
+    if (sentence.length > 0) innerRecursive(sentence.tail.toList, sentence.head, 1)
     else ""
   }
 }

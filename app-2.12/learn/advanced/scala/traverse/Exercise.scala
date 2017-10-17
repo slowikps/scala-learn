@@ -1,20 +1,18 @@
 package learn.advanced.scala.traverse
 
 import cats.Applicative
-import cats.data.EitherT
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 object Exercise extends App {
 
-  import scala.language.higherKinds
-
-
+  import cats.instances.future._
   import cats.syntax.applicative._
   import cats.syntax.cartesian._
-  import cats.instances.future._
+
+  import scala.language.higherKinds
 
   def getUptime(hostname: String): Future[Int] =
     Future(hostname.length * 60) // just for demonstration
@@ -51,8 +49,8 @@ object Exercise extends App {
   //Option
   import cats.instances.list._
   import cats.instances.option._
-  import cats.syntax.traverse._
   import cats.syntax.option._
+  import cats.syntax.traverse._
 
   val listOfOption = List(1.some, 2.some, 3.some)
 

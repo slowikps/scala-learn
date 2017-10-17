@@ -1,6 +1,7 @@
 package learn.advanced.scala.either
 
 import cats.data.EitherT
+import cats.{ApplicativeError, Monad, MonadError}
 
 import scala.concurrent.Future
 
@@ -8,15 +9,40 @@ object ErrorHandling extends App {
 
   type MyErrorType[A] = EitherT[Future, A, Int]
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import cats.instances.future._
-  import cats.syntax.applicative._
+  import cats.instances.list._
 
+  def fullConversionPath()(implicit monad: Monad[List]) = {
+    val monadError: MonadError[EitherT[List, String, ?], String] =
+      EitherT.catsDataMonadErrorForEitherT(monad)
 
-  val err = "s"//"Big fat error".pure[MyErrorType]
+    val whatIsThat: EitherT[List, String, Int] = monadError.raiseError[Int]("Some error")
 
+    whatIsThat
+  }
 
-  println("The error is: " + err)
+  def shorterConversionPath()(implicit mE: ApplicativeError[EitherT[List, String, ?], String]) = {
+    val whatIsThat: EitherT[List, String, Int] = mE.raiseError[Int]("Some error")
+
+    whatIsThat
+  }
+
+  type MyEither[A] = EitherT[List, String, A]
+  def shorterSyntaxConversionPath()(implicit mE: ApplicativeError[EitherT[List, String, ?], String]) = {
+    import cats.syntax.applicativeError._
+    val whatIsThat: EitherT[List, String, Int] = "Some error".raiseError[MyEither, Int]
+
+    whatIsThat
+  }
+
+  println("The error is: " + fullConversionPath())
+  println("The error is: " + shorterConversionPath())
+  println("The error is: " + shorterSyntaxConversionPath())
+
+  {
+    import cats.syntax.applicativeError._
+    val tmp: EitherT[List, String, Int] = "Some error".raiseError[EitherT[List, String, ?], Int]
+    println("Directly: " + tmp)
+  }
   println("The end")
 
 }

@@ -19,16 +19,28 @@ object FridayEveningFutures extends App with FancyLogging {
 
   def consume(treat: FridayTreat) = info(s"About to consume: $treat")
 
-  //Definition First!
-  {
-    //Step 1 - ugly way
-    val futBear = Future(provide("beer"))
-    val futPizza = Future(provide("pizza"))
-    Await.result(futBear, 5 seconds)
-    Await.result(futPizza, 5 seconds)
 
-    consume(futBear.value.get.get and futPizza.value.get.get)
-  }
+
+
+  //Definition First!
+//  {
+//    //Step 1 - ugly way
+//    val futBear = Future(provide("beer"))
+//    val futPizza = Future(provide("pizza"))
+//    //Blocking
+//    Await.result(futBear, 5 seconds)
+//    Await.result(futPizza, 5 seconds)
+//
+//    consume(futBear.value.get.get and futPizza.value.get.get)
+//  }
+//
+
+
+
+
+
+
+
 
   {
     //Step 2 - not really working
@@ -40,15 +52,30 @@ object FridayEveningFutures extends App with FancyLogging {
     Await.result(treat, 5 seconds)
   }
 
-  {
-    //Step 3
-    val futBear = Future(provide("beer"))
-    val futPizza = Future(provide("pizza"))
-    val treat = for {
-      bear <- futBear
-      pizza <- futPizza
-    } yield (consume(bear and pizza))
-    Await.result(treat, 5 seconds)
-  }
 
+
+
+
+
+
+
+
+//
+//  {
+//    //Step 3
+//    val futBear = Future(provide("beer"))
+//    val futPizza = Future(provide("pizza"))
+//
+//    val treat = for {
+//      bear <- futBear
+//      pizza <- futPizza
+//    } yield (consume(bear and pizza))
+//    Await.result(treat, 5 seconds)
+//  }
+//
+//
+//
+//  println(
+//    Future.successful("No need to context switch")
+//  )
 }

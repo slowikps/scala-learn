@@ -7,6 +7,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object FutureTest extends App {
 
+
+  val res = Future.sequence(List(Future(1), Future(2), Future(throw new IllegalArgumentException("")), Future(3)))
+
+  TimeUnit.SECONDS.sleep(1)
+
+  println("Res:" + res)
+
+
   def getFailed(condition: Boolean) =
     if(condition) Future.failed(new RuntimeException)
     else Future.successful(11)

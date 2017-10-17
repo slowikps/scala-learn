@@ -7,6 +7,7 @@ import akka.event.Logging
 class Child extends Actor {
   val log = Logging(context.system, this)
   log.info(s"Child constructor [$this]")
+
   override def receive: Receive = {
     case WakeUpMySon =>
       log.info("I am awake father!")

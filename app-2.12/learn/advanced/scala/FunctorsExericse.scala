@@ -2,8 +2,6 @@ package learn.advanced.scala
 
 import cats.{Functor, Monad}
 
-import scala.util.Success
-
 sealed trait Tree[+A]
 
 final case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]

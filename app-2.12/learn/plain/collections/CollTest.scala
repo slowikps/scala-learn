@@ -7,6 +7,10 @@ object CollTest {
 
   def main(args: Array[String]): Unit = {
     println(
+      "Scala way: " + List("A", "B", "C", "D", "A", "D").groupBy(a => a).mapValues(_.size)
+    )
+
+    println(
       "(1 until 10).toList: " + (1 until 10).toList
     )
 

@@ -9,6 +9,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object FutureStuff extends App {
   println("Start")
 
+  def sum(in: List[Future[Int]]): Future[Int] = {
+    in.foldLeft(Future.successful(0)) {
+      case (facc, ft) => facc.flatMap(acc => ft.map(_ + acc))
+    }
+  }
+
   var in: List[Future[Int]] = List(Future.successful(1), Future.failed(new RuntimeException("Boom")), Future.successful(2), Future.successful(3))
 
   in = in.map(_.recover { case _ => 0 })
@@ -30,7 +36,7 @@ object FutureStuff extends App {
   )
   val testUid = UUID.randomUUID()
   println(
-    "Set test on testClass: " + (List(DiffTestCase(testUid, "Pawel"), DiffTestCase(UUID.randomUUID(), "Pawel"),  DiffTestCase(testUid, "Pawel")).toSet)
+    "Set test on testClass: " + (List(DiffTestCase(testUid, "Pawel"), DiffTestCase(UUID.randomUUID(), "Pawel"), DiffTestCase(testUid, "Pawel")).toSet)
   )
 
 

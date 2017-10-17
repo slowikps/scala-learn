@@ -13,16 +13,23 @@ object PromisesExample extends App with FancyLogging {
     * Promise can be thought of as a writable, single-assignment container,
     */
 
-  val promise = Promise[Int]()
-  val future = promise.future
+  val promise: Promise[Int] = Promise[Int]()
+  val future: Future[Int] = promise.future
+
+
 
   future.foreach {
     case res => info(s"I got: $res")
   }
 
+  //Completes the promise with an exception.
   promise success 23
 
+
   TimeUnit.SECONDS.sleep(1)
+
+
+
 
   /**
     * In some cases the client may want to complete the promise only if it has not been completed yet
@@ -32,10 +39,14 @@ object PromisesExample extends App with FancyLogging {
     * For these reasons methods tryComplete, trySuccess and tryFailure exist on future.
     * The client should be aware that using these methods results in programs which are not deterministic, but depend on the execution schedule.
     */
-  //  promise trySuccess {
-  //    info("Try to finish Promise again - which is ok")
-  //    1
-  //  }
+    promise trySuccess {
+      info("Try to finish Promise again - which is ok")
+      1
+    }
+
+
+  //  2) Illegal:
+    promise failure new IllegalArgumentException("You cannot change value of the Promise")
 
   def first[T](f: Future[T], g: Future[T]): Future[T] = {
     val p = Promise[T]
@@ -48,6 +59,6 @@ object PromisesExample extends App with FancyLogging {
     p.future
   }
 
-  //  2) Illegal:
-  //  promise failure new IllegalArgumentException("You cannot change value of the Promise")
+
+  TimeUnit.SECONDS.sleep(1)
 }

@@ -15,24 +15,28 @@ object Callbacks extends App with FancyLogging {
     * We now know how to start an asynchronous computation to create a new future value,
     * but we have not shown how to use the result once it becomes available
     */
-
   Future {
-    //Computation is scheduled to start immediately
     info("Doing expensive operation")
-    ExpensiveOperation.doIt() // non-blocking long lasting computation
+    ExpensiveOperation.doIt()
   } onComplete { //Try[ExpensiveOperationResult]
-    case Success(ExpensiveOperationResult(result)) => info(s"Success: $result")
-    case Failure(ex) => info(s"Failure [ex: $ex]")
+    case Success(ExpensiveOperationResult(result)) => info(s"1Success: $result")
+    case Failure(ex) => info(s"1Failure [ex: $ex]")
   }
+
 
   Future {
     throw new IllegalArgumentException("Bleh - exception")
   } onComplete { //Try[ExpensiveOperationResult]
-    case Success(_) => info(s"Success")
-    case Failure(ex) => info(s"Failure [ex: $ex]")
+    case Success(_) => info(s"2Success")
+    case Failure(ex) => info(s"2Failure [ex: $ex]")
   }
 
   TimeUnit.SECONDS.sleep(1)
+
+
+
+
+
   /**
     * This callback is called asynchronously once the future is completed.
     * If the future has already been completed when registering the callback,
