@@ -1,11 +1,12 @@
 package learn.presentations.futureandpromise
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Executors, TimeUnit}
 
+import controllers.Execution
 import learn.presentations.futureandpromise.utils.FancyLogging
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 object PromisesExample extends App with FancyLogging {
 
